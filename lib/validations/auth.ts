@@ -14,12 +14,17 @@ export const registerSchema = z.object({
   role: z.enum(["BUYER", "SELLER"]).default("BUYER"),
   // Field tambahan ini hanya wajib diisi kalau role === "SELLER"
   storeName: z.string().optional(),
+  storeCity: z.string().optional(),
+  storePostalCode: z.string().optional(),
 }).refine(
   (data) => data.role !== "SELLER" || (data.storeName && data.storeName.length > 0),
-  {
-    message: "Nama toko wajib diisi untuk pendaftaran seller",
-    path: ["storeName"],
-  }
+  { message: "Nama toko wajib diisi untuk pendaftaran seller", path: ["storeName"] }
+).refine(
+  (data) => data.role !== "SELLER" || (data.storeCity && data.storeCity.length > 0),
+  { message: "Kota toko wajib diisi (untuk hitung ongkir)", path: ["storeCity"] }
+).refine(
+  (data) => data.role !== "SELLER" || (data.storePostalCode && /^\d{5}$/.test(data.storePostalCode)),
+  { message: "Kode pos toko wajib diisi, 5 digit angka", path: ["storePostalCode"] }
 );
 
 export type RegisterInput = z.infer<typeof registerSchema>;

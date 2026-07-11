@@ -88,6 +88,13 @@ model Seller {
   isApproved  Boolean  @default(false)
   createdAt   DateTime @default(now())
 
+  // Alamat asal pengiriman — dibutuhkan untuk hitung ongkir via Biteship.
+  // postalCode WAJIB diisi sebelum seller bisa menjual (dicek di validasi),
+  // karena tanpa ini API ongkir tidak bisa dipanggil.
+  storeAddress    String?
+  storeCity       String?
+  storePostalCode String?
+
   products Product[]
 
   @@map("sellers")
@@ -116,6 +123,7 @@ model Product {
   slug        String   @unique
   description String
   price       Int // simpan dalam rupiah (integer), hindari float untuk uang
+  weight      Int      @default(500) // berat dalam GRAM — dipakai untuk hitung ongkir
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

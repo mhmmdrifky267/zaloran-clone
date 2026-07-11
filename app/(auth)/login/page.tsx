@@ -73,6 +73,15 @@ export default function LoginPage() {
         >
           {loading ? "Memproses..." : "Masuk"}
         </button>
+
+        <div className="flex items-center justify-between text-sm">
+          <a href="/forgot-password" className="text-gray-500 hover:underline">
+            Lupa sandi?
+          </a>
+          <a href="/register" className="text-blue-600 hover:underline">
+            Belum punya akun? Daftar
+          </a>
+        </div>
       </form>
     </div>
   );

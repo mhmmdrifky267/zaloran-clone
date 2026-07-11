@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, email, password, role, storeName } = parsed.data;
+    const { name, email, password, role, storeName, storeCity, storePostalCode } = parsed.data;
 
     // 2. Cek email sudah dipakai atau belum
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -55,6 +55,8 @@ export async function POST(request: Request) {
           data: {
             userId: newUser.id,
             storeName,
+            storeCity,
+            storePostalCode,
             isApproved: false, // butuh approval admin sebelum bisa jualan
           },
         });

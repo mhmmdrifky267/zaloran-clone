@@ -1530,7 +1530,10 @@ export const SellerScalarFieldEnum = {
   storeLogo: 'storeLogo',
   description: 'description',
   isApproved: 'isApproved',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  storeAddress: 'storeAddress',
+  storeCity: 'storeCity',
+  storePostalCode: 'storePostalCode'
 } as const
 
 export type SellerScalarFieldEnum = (typeof SellerScalarFieldEnum)[keyof typeof SellerScalarFieldEnum]
@@ -1554,6 +1557,7 @@ export const ProductScalarFieldEnum = {
   slug: 'slug',
   description: 'description',
   price: 'price',
+  weight: 'weight',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

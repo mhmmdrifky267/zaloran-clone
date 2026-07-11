@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 import {
   getProductBySlug,
   getRelatedProducts,
+  getStoreProducts,
 } from "@/services/product.service";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { VariantSelector } from "@/components/product/VariantSelector";
 import { ProductCard } from "@/components/product/ProductCard";
+import { StoreSection } from "@/components/product/StoreSection";
 
 export default async function ProductDetailPage({
   params,
@@ -17,16 +19,14 @@ export default async function ProductDetailPage({
   const { slug } = await params;
   const product = await getProductBySlug(slug);
 
-  // Kalau produk tidak ada (atau isActive: false), tampilkan halaman 404
-  // bawaan Next.js, bukan crash atau halaman kosong.
   if (!product) {
     notFound();
   }
 
-  const relatedProducts = await getRelatedProducts(
-    product.categoryId,
-    product.id
-  );
+  const [relatedProducts, storeProducts] = await Promise.all([
+    getRelatedProducts(product.categoryId, product.id),
+    getStoreProducts(product.sellerId, product.id),
+  ]);
 
   const avgRating =
     product.reviews.length > 0
@@ -40,11 +40,10 @@ export default async function ProductDetailPage({
         <ProductGallery images={product.images} productName={product.name} />
 
         <div>
-          <p className="text-sm text-gray-500">{product.category.name}</p>
-          <h1 className="mt-1 text-2xl font-bold">{product.name}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Dijual oleh {product.seller.storeName}
+            {product.category.name}
           </p>
+          <h1 className="mt-1 text-2xl font-bold">{product.name}</h1>
 
           {avgRating && (
             <p className="mt-2 text-sm">
@@ -65,6 +64,14 @@ export default async function ProductDetailPage({
           </div>
         </div>
       </div>
+
+      {/* ---- Section Toko ---- */}
+      <StoreSection
+        sellerId={product.sellerId}
+        storeName={product.seller.storeName}
+        storeLogo={product.seller.storeLogo}
+        products={storeProducts}
+      />
 
       {/* ---- Ulasan ---- */}
       {product.reviews.length > 0 && (

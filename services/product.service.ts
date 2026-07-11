@@ -198,3 +198,37 @@ export async function getRelatedProducts(
     take: 4,
   });
 }
+
+// Produk lain dari toko yang sama — dipakai di section "Produk lain dari
+// toko ini" pada halaman detail produk, dan di halaman profil toko.
+export async function getStoreProducts(
+  sellerId: string,
+  excludeProductId?: string
+) {
+  return prisma.product.findMany({
+    where: {
+      sellerId,
+      isActive: true,
+      ...(excludeProductId && { id: { not: excludeProductId } }),
+    },
+    include: {
+      images: { where: { isPrimary: true }, take: 1 },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 8,
+  });
+}
+
+export async function getSellerProfile(sellerId: string) {
+  return prisma.seller.findUnique({
+    where: { id: sellerId },
+    select: {
+      id: true,
+      storeName: true,
+      storeLogo: true,
+      description: true,
+      createdAt: true,
+      _count: { select: { products: true } },
+    },
+  });
+}

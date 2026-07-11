@@ -12,6 +12,8 @@ export default function RegisterPage() {
     email: "",
     password: "",
     storeName: "",
+    storeCity: "",
+    storePostalCode: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -105,19 +107,54 @@ export default function RegisterPage() {
 
         {/* Field ini hanya muncul kalau daftar sebagai Seller */}
         {role === "SELLER" && (
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Nama Toko
-            </label>
-            <input
-              required
-              value={form.storeName}
-              onChange={(e) =>
-                setForm({ ...form, storeName: e.target.value })
-              }
-              className="w-full rounded-md border px-3 py-2"
-            />
-          </div>
+          <>
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Nama Toko
+              </label>
+              <input
+                required
+                value={form.storeName}
+                onChange={(e) =>
+                  setForm({ ...form, storeName: e.target.value })
+                }
+                className="w-full rounded-md border px-3 py-2"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  Kota Toko
+                </label>
+                <input
+                  required
+                  value={form.storeCity}
+                  onChange={(e) =>
+                    setForm({ ...form, storeCity: e.target.value })
+                  }
+                  className="w-full rounded-md border px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  Kode Pos
+                </label>
+                <input
+                  required
+                  placeholder="cth. 40123"
+                  value={form.storePostalCode}
+                  onChange={(e) =>
+                    setForm({ ...form, storePostalCode: e.target.value })
+                  }
+                  className="w-full rounded-md border px-3 py-2"
+                />
+              </div>
+            </div>
+            <p className="-mt-2 text-xs text-gray-500">
+              Kota & kode pos dipakai untuk menghitung ongkos kirim ke pembeli.
+            </p>
+          </>
         )}
 
         {error && <p className="text-sm text-red-600">{error}</p>}
