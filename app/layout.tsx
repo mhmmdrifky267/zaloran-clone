@@ -14,8 +14,8 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Zaloran Clone",
-  description: "E-commerce belajar Next.js",
+  title: "R.O.X.",
+  description: "Belanja fashion favoritmu di R.O.X.",
 };
 
 export default function RootLayout({

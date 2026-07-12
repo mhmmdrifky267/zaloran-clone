@@ -1,11 +1,12 @@
 // app/(seller)/dashboard/products/new/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 
 type Variant = { size: string; color: string; stock: number };
+type Category = { id: string; name: string };
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -13,12 +14,21 @@ export default function NewProductPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [variants, setVariants] = useState<Variant[]>([
     { size: "", color: "", stock: 0 },
   ]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function loadCategories() {
+      const res = await fetch("/api/categories");
+      if (res.ok) setCategories(await res.json());
+    }
+    loadCategories();
+  }, []);
 
   function addVariant() {
     setVariants([...variants, { size: "", color: "", stock: 0 }]);
@@ -113,19 +123,22 @@ export default function NewProductPage() {
             />
           </div>
 
-          {/* Sementara pakai input manual untuk categoryId.
-              Nanti bisa diganti <select> yang isinya di-fetch dari /api/categories */}
+          {/* Dropdown kategori — user pilih nama kategori aslinya, bukan ID mentah */}
           <div>
-            <label className="mb-1 block text-sm font-medium">
-              Category ID
-            </label>
-            <input
+            <label className="mb-1 block text-sm font-medium">Kategori</label>
+            <select
               required
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              placeholder="lihat di Prisma Studio tabel categories"
               className="w-full rounded-md border px-3 py-2"
-            />
+            >
+              <option value="">Pilih kategori</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

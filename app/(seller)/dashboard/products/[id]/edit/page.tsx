@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 
 type Variant = { size: string; color: string; stock: number };
+type Category = { id: string; name: string };
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -16,12 +17,21 @@ export default function EditProductPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [variants, setVariants] = useState<Variant[]>([
     { size: "", color: "", stock: 0 },
   ]);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function loadCategories() {
+      const res = await fetch("/api/categories");
+      if (res.ok) setCategories(await res.json());
+    }
+    loadCategories();
+  }, []);
 
   // Muat data produk yang sudah ada, isi form dengannya
   useEffect(() => {
@@ -152,13 +162,20 @@ export default function EditProductPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium">Category ID</label>
-            <input
+            <label className="mb-1 block text-sm font-medium">Kategori</label>
+            <select
               required
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
               className="w-full rounded-md border px-3 py-2"
-            />
+            >
+              <option value="">Pilih kategori</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
