@@ -34,13 +34,13 @@ export function Navbar() {
   }, []);
 
   return (
-    <header className="border-b">
+    <header className="sticky top-0 z-40 border-b bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href="/" className="text-lg font-bold">
+        <Link href="/" className="text-base font-bold sm:text-lg">
           R.O.X.
         </Link>
 
-        <nav className="flex items-center gap-5 text-sm">
+        <nav className="flex items-center gap-3 text-sm sm:gap-5">
           <Link href="/products">Produk</Link>
 
           {session?.user ? (
@@ -66,7 +66,7 @@ export function Navbar() {
                   className="flex items-center gap-1"
                 >
                   <User className="h-5 w-5" />
-                  <span>{session.user.name}</span>
+                  <span className="hidden sm:inline">{session.user.name}</span>
                   <ChevronDown className="h-4 w-4" />
                 </button>
 

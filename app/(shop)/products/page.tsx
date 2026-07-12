@@ -36,53 +36,60 @@ export default async function ProductsPage({
   });
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="mb-6 text-2xl font-bold">Semua Produk</h1>
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
+      <h1 className="mb-4 text-xl font-bold sm:mb-6 sm:text-2xl">Semua Produk</h1>
 
-      {/* Form filter — pakai GET biasa, tidak perlu JavaScript sama sekali */}
-      <form className="mb-8 flex flex-wrap gap-3" action="/products">
+      {/* Form filter — pakai GET biasa, tidak perlu JavaScript sama sekali.
+          Mobile: search full-width sendiri, kategori+sort dibagi 2 kolom sama
+          rata, tombol full-width di bawah. Desktop (sm+): semua sejajar satu baris. */}
+      <form
+        className="mb-6 flex flex-col gap-2 sm:mb-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3"
+        action="/products"
+      >
         <input
           name="search"
           defaultValue={params.search}
           placeholder="Cari produk..."
-          className="flex-1 rounded-md border px-3 py-2"
+          className="w-full rounded-md border px-3 py-2 text-sm sm:flex-1"
         />
 
-        <select
-          name="category"
-          defaultValue={params.category ?? ""}
-          className="rounded-md border px-3 py-2"
-        >
-          <option value="">Semua Kategori</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.slug}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        <div className="grid grid-cols-2 gap-2 sm:contents">
+          <select
+            name="category"
+            defaultValue={params.category ?? ""}
+            className="w-full rounded-md border px-3 py-2 text-sm sm:w-auto"
+          >
+            <option value="">Semua Kategori</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.slug}>
+                {c.name}
+              </option>
+            ))}
+          </select>
 
-        <select
-          name="sort"
-          defaultValue={params.sort ?? "newest"}
-          className="rounded-md border px-3 py-2"
-        >
-          <option value="newest">Terbaru</option>
-          <option value="price_asc">Harga Terendah</option>
-          <option value="price_desc">Harga Tertinggi</option>
-        </select>
+          <select
+            name="sort"
+            defaultValue={params.sort ?? "newest"}
+            className="w-full rounded-md border px-3 py-2 text-sm sm:w-auto"
+          >
+            <option value="newest">Terbaru</option>
+            <option value="price_asc">Harga Terendah</option>
+            <option value="price_desc">Harga Tertinggi</option>
+          </select>
+        </div>
 
         <button
           type="submit"
-          className="rounded-md bg-black px-4 py-2 text-sm text-white"
+          className="w-full rounded-md bg-black px-4 py-2 text-sm font-medium text-white sm:w-auto"
         >
           Terapkan
         </button>
       </form>
 
       {products.length === 0 ? (
-        <p className="text-gray-500">Tidak ada produk yang cocok.</p>
+        <p className="text-sm text-gray-500">Tidak ada produk yang cocok.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
           {products.map((product) => (
             <ProductCard
               key={product.id}
