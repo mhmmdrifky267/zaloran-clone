@@ -36,21 +36,77 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-8 sm:py-10">
-      {/* ---- Hero sesuai referensi: latar ink, stamp "Musim Baru", tag CTA ---- */}
+      {/* ---- Hero: latar ink, tekstur grid halus, registration marks di sudut
+             (motif customs/manifest), stamp + headline + CTA + ringkasan cepat ---- */}
       <div
-        className="mb-10 flex flex-col items-start justify-between gap-6 rounded-md px-6 py-9 sm:flex-row sm:items-center sm:px-10 sm:py-12"
+        className="relative mb-10 overflow-hidden rounded-md px-6 py-10 sm:px-10 sm:py-14"
         style={{ background: "var(--ink)", color: "var(--paper)" }}
       >
-        <div>
-          <span className="stamp" style={{ color: "#fff", borderColor: "#fff", background: "transparent" }}>
-            Musim Baru
-          </span>
-          <p className="font-display mt-3 max-w-md text-[26px] font-black leading-tight sm:text-[34px]">
-            Koleksi Akhir Tahun, Untuk Setiap Gaya.
-          </p>
-          <Link href="/products" className="tag mt-4 inline-flex" style={{ background: "var(--stamp-red)" }}>
-            Belanja Sekarang →
-          </Link>
+        {/* corner registration marks — signature motif R.O.X. */}
+        <span className="pointer-events-none absolute left-3 top-3 h-3 w-3 border-l border-t border-white/25 sm:h-4 sm:w-4" />
+        <span className="pointer-events-none absolute right-3 top-3 h-3 w-3 border-r border-t border-white/25 sm:h-4 sm:w-4" />
+        <span className="pointer-events-none absolute bottom-3 left-3 h-3 w-3 border-b border-l border-white/25 sm:h-4 sm:w-4" />
+        <span className="pointer-events-none absolute bottom-3 right-3 h-3 w-3 border-b border-r border-white/25 sm:h-4 sm:w-4" />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
+          }}
+        />
+
+        <div className="relative flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-lg">
+            <div className="mb-4 flex items-center gap-3">
+              <span
+                className="stamp"
+                style={{ color: "#fff", borderColor: "#fff", background: "transparent" }}
+              >
+                Musim Baru
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/50">
+                Edisi 004 · Akhir Tahun
+              </span>
+            </div>
+            <p className="font-display text-[32px] font-black leading-[1.05] tracking-tight sm:text-[46px]">
+              Koleksi Akhir Tahun,
+              <br />
+              Untuk Setiap Gaya.
+            </p>
+            <p className="mt-4 max-w-sm text-[14px] leading-relaxed text-white/60">
+              Kurasi terbaru dari ratusan penjual terpercaya — dikirim dengan manifest
+              yang jelas, tanpa drama.
+            </p>
+            <Link
+              href="/products"
+              className="tag mt-6 inline-flex text-[12px]"
+              style={{ background: "var(--stamp-red)" }}
+            >
+              Belanja Sekarang →
+            </Link>
+          </div>
+
+          <dl className="grid grid-cols-3 gap-4 border-t border-white/15 pt-5 sm:w-64 sm:border-t-0 sm:border-l sm:pl-8 sm:pt-0">
+            <div>
+              <dt className="font-mono text-[9px] uppercase tracking-[0.1em] text-white/45">
+                Kategori
+              </dt>
+              <dd className="font-display mt-1 text-lg font-extrabold">{categories.length}</dd>
+            </div>
+            <div>
+              <dt className="font-mono text-[9px] uppercase tracking-[0.1em] text-white/45">
+                Promo
+              </dt>
+              <dd className="font-display mt-1 text-lg font-extrabold">{promoProducts.length}</dd>
+            </div>
+            <div>
+              <dt className="font-mono text-[9px] uppercase tracking-[0.1em] text-white/45">
+                Terlaris
+              </dt>
+              <dd className="font-display mt-1 text-lg font-extrabold">{popularProducts.length}</dd>
+            </div>
+          </dl>
         </div>
       </div>
 

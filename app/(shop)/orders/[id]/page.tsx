@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { getOrderById } from "@/services/order.service";
 import { canUserReviewProduct, hasUserReviewedProduct } from "@/services/review.service";
 import { ReviewForm } from "@/components/review/ReviewForm";
+import { PayAgainButton } from "@/components/product/PayAgainButton";
 
 const statusLabel: Record<string, string> = {
   PENDING: "Menunggu Pembayaran",
@@ -13,6 +14,16 @@ const statusLabel: Record<string, string> = {
   SHIPPED: "Dikirim",
   COMPLETED: "Selesai",
   CANCELLED: "Dibatalkan",
+};
+
+// Warna tag per status — mengikuti palet stamp yang sama dengan badge diskon/baru
+const statusTagClass: Record<string, string> = {
+  PENDING: "tag-ghost",
+  PAID: "tag-blue",
+  PROCESSING: "tag-blue",
+  SHIPPED: "tag-moss",
+  COMPLETED: "tag-moss",
+  CANCELLED: "tag-gray",
 };
 
 export default async function OrderDetailPage({
@@ -48,59 +59,86 @@ export default async function OrderDetailPage({
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
+    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Detail Pesanan</h1>
-        <span className="rounded-full bg-gray-100 px-3 py-1 text-sm">
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em]" style={{ color: "var(--gray)" }}>
+            Manifest #{order.id.slice(-8).toUpperCase()}
+          </p>
+          <h1 className="font-display mt-1 text-2xl font-black tracking-tight">Detail Pesanan</h1>
+        </div>
+        <span className={`tag ${statusTagClass[order.status] ?? "tag-gray"}`}>
           {statusLabel[order.status] ?? order.status}
         </span>
       </div>
 
-      <div className="mb-4 rounded-md border p-4">
-        <p className="text-sm text-gray-500">Toko</p>
-        <p className="font-medium">{order.seller.storeName}</p>
+      {/* ---- Bayar lagi — hanya untuk pesanan yang masih menunggu pembayaran ---- */}
+      {order.status === "PENDING" && (
+        <div
+          className="mb-6 rounded-md px-5 py-5"
+          style={{ background: "var(--ink)", color: "var(--paper)" }}
+        >
+          <p className="font-display text-[15px] font-extrabold">Menunggu Pembayaran</p>
+          <p className="mt-1 mb-4 text-[13px] text-white/60">
+            Selesaikan pembayaran sebelum sesi kedaluwarsa, atau buat sesi baru di bawah ini.
+          </p>
+          <PayAgainButton orderId={order.id} />
+        </div>
+      )}
+
+      <div className="mb-4 rounded-md p-4" style={{ border: "1px solid var(--line)", background: "var(--paper)" }}>
+        <p className="font-mono text-[10px] uppercase tracking-[0.1em]" style={{ color: "var(--gray)" }}>
+          Toko
+        </p>
+        <p className="mt-1 font-semibold">{order.seller.storeName}</p>
       </div>
 
-      <div className="mb-4 rounded-md border p-4">
-        <p className="mb-2 text-sm font-medium">Alamat Pengiriman</p>
-        <p className="text-sm text-gray-600">
+      <div className="mb-4 rounded-md p-4" style={{ border: "1px solid var(--line)", background: "var(--paper)" }}>
+        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.1em]" style={{ color: "var(--gray)" }}>
+          Alamat Pengiriman
+        </p>
+        <p className="text-[13px] leading-relaxed">
           {order.address.recipient} — {order.address.fullAddress},{" "}
           {order.address.city} {order.address.postalCode}
         </p>
         {order.courierName && (
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 font-mono text-[11px]" style={{ color: "var(--gray)" }}>
             Kurir: {order.courierName.toUpperCase()} - {order.courierService}
           </p>
         )}
       </div>
 
-      <div className="mb-4 rounded-md border p-4">
-        <p className="mb-2 text-sm font-medium">Produk</p>
+      <div className="mb-6 rounded-md p-4" style={{ border: "1px solid var(--line)", background: "var(--paper)" }}>
+        <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.1em]" style={{ color: "var(--gray)" }}>
+          Produk
+        </p>
         <div className="space-y-2">
           {order.items.map((item) => (
-            <div key={item.id} className="flex justify-between text-sm">
+            <div key={item.id} className="flex justify-between text-[13px]">
               <span>
                 {item.variant.product.name} x{item.qty}
               </span>
-              <span>
+              <span className="font-mono font-semibold">
                 Rp{(item.priceAtOrder * item.qty).toLocaleString("id-ID")}
               </span>
             </div>
           ))}
         </div>
 
-        <div className="mt-3 space-y-1 border-t pt-3 text-sm">
-          <div className="flex justify-between">
+        <hr className="divider-dash" />
+
+        <div className="space-y-1.5 text-[13px]">
+          <div className="flex justify-between" style={{ color: "var(--gray)" }}>
             <span>Subtotal</span>
-            <span>Rp{order.itemsTotal.toLocaleString("id-ID")}</span>
+            <span className="font-mono">Rp{order.itemsTotal.toLocaleString("id-ID")}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between" style={{ color: "var(--gray)" }}>
             <span>Ongkir</span>
-            <span>Rp{order.shippingCost.toLocaleString("id-ID")}</span>
+            <span className="font-mono">Rp{order.shippingCost.toLocaleString("id-ID")}</span>
           </div>
-          <div className="flex justify-between font-semibold">
+          <div className="flex justify-between text-[15px] font-bold">
             <span>Total</span>
-            <span>Rp{order.totalPrice.toLocaleString("id-ID")}</span>
+            <span className="font-mono">Rp{order.totalPrice.toLocaleString("id-ID")}</span>
           </div>
         </div>
       </div>
@@ -116,7 +154,8 @@ export default async function OrderDetailPage({
               return (
                 <p
                   key={item.id}
-                  className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-500"
+                  className="rounded-md px-3 py-2.5 font-mono text-[11px]"
+                  style={{ background: "var(--muted)", color: "var(--gray)" }}
                 >
                   ✓ Kamu sudah mengulas {item.variant.product.name}
                 </p>
@@ -126,7 +165,7 @@ export default async function OrderDetailPage({
             if (status === "can_review") {
               return (
                 <div key={item.id}>
-                  <p className="mb-1 text-sm text-gray-500">
+                  <p className="mb-1 text-[13px]" style={{ color: "var(--gray)" }}>
                     {item.variant.product.name}
                   </p>
                   <ReviewForm productId={productId} />

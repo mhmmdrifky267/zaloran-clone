@@ -24,10 +24,18 @@ export function PromoSection({ products }: { products: PromoProduct[] }) {
 
   return (
     <section
-      className="mb-10 rounded-md px-4 py-6 sm:px-6 sm:py-8"
+      className="relative mb-12 overflow-hidden rounded-md px-4 py-6 sm:px-6 sm:py-8"
       style={{ background: "var(--ink)" }}
     >
-      <div className="mb-4 flex items-center justify-between">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.05]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+        }}
+      />
+      <div className="relative mb-5 flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2">
           <span
             className="stamp"
@@ -35,7 +43,7 @@ export function PromoSection({ products }: { products: PromoProduct[] }) {
           >
             Promo
           </span>
-          <span className="font-display text-[15px] font-extrabold text-white">
+          <span className="font-display text-[16px] font-extrabold tracking-tight text-white">
             Lagi Diskon
           </span>
         </div>
@@ -50,7 +58,7 @@ export function PromoSection({ products }: { products: PromoProduct[] }) {
 
       {/* Scroll horizontal di mobile (lebih hemat tempat vertikal & terasa
           seperti carousel promo di app e-commerce), grid biasa di desktop */}
-      <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-5">
+      <div className="scroll-rail relative -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-5">
         {products.map((product) => (
           <div key={product.id} className="w-[42%] shrink-0 sm:w-auto">
             <ProductCard

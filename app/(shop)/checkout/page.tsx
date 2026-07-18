@@ -199,12 +199,19 @@ export default function CheckoutPage() {
     processNext(0);
   }
 
-  if (loading) return <div className="py-10 text-center">Memuat checkout...</div>;
+  if (loading)
+    return (
+      <div className="py-16 text-center font-mono text-[12px] uppercase tracking-[0.1em]" style={{ color: "var(--gray)" }}>
+        Memuat checkout...
+      </div>
+    );
 
   if (groups.length === 0) {
     return (
-      <div className="py-16 text-center text-gray-500">
-        Keranjang kamu kosong.
+      <div className="mx-auto max-w-md px-4 py-16 text-center">
+        <p className="text-[13px]" style={{ color: "var(--gray)" }}>
+          Keranjang kamu kosong.
+        </p>
       </div>
     );
   }
@@ -217,68 +224,89 @@ export default function CheckoutPage() {
         strategy="afterInteractive"
       />
 
-      <div className="mx-auto max-w-3xl px-4 py-10">
-        <h1 className="mb-6 text-2xl font-bold">Checkout</h1>
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-8">
+        <p className="font-mono text-[10px] uppercase tracking-[0.14em]" style={{ color: "var(--gray)" }}>
+          Manifest Pengiriman
+        </p>
+        <h1 className="font-display mb-6 mt-1 text-2xl font-black tracking-tight">Checkout</h1>
 
         {/* ---- Pilih alamat ---- */}
-        <div className="mb-6 rounded-md border p-4">
-          <p className="mb-3 font-medium">Alamat Pengiriman</p>
+        <div className="mb-5 rounded-md p-4" style={{ border: "1px solid var(--line)", background: "var(--paper)" }}>
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.1em]" style={{ color: "var(--gray)" }}>
+            01 — Alamat Pengiriman
+          </p>
           {addresses.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-[13px]" style={{ color: "var(--gray)" }}>
               Kamu belum punya alamat.{" "}
-              <a href="/profile" className="text-blue-600 underline">
+              <a href="/profile" style={{ color: "var(--stamp-blue)" }} className="underline">
                 Tambah alamat dulu
               </a>
             </p>
           ) : (
             <div className="space-y-2">
-              {addresses.map((address) => (
-                <label
-                  key={address.id}
-                  className="flex items-start gap-2 text-sm"
-                >
-                  <input
-                    type="radio"
-                    checked={selectedAddressId === address.id}
-                    onChange={() => {
-                      setSelectedAddressId(address.id);
-                      setRates({});
-                      setSelectedCourier({});
+              {addresses.map((address) => {
+                const active = selectedAddressId === address.id;
+                return (
+                  <label
+                    key={address.id}
+                    className="flex cursor-pointer items-start gap-3 rounded-md p-3 text-[13px] transition-colors"
+                    style={{
+                      border: `1px solid ${active ? "var(--ink)" : "var(--line)"}`,
+                      background: active ? "var(--muted)" : "transparent",
                     }}
-                  />
-                  <span>
-                    <strong>{address.label}</strong> — {address.recipient},{" "}
-                    {address.fullAddress}, {address.city} {address.postalCode}
-                  </span>
-                </label>
-              ))}
+                  >
+                    <input
+                      type="radio"
+                      className="mt-1"
+                      checked={active}
+                      onChange={() => {
+                        setSelectedAddressId(address.id);
+                        setRates({});
+                        setSelectedCourier({});
+                      }}
+                    />
+                    <span>
+                      <strong>{address.label}</strong> — {address.recipient},{" "}
+                      {address.fullAddress}, {address.city} {address.postalCode}
+                    </span>
+                  </label>
+                );
+              })}
             </div>
           )}
         </div>
 
         {/* ---- Per toko: item + ongkir ---- */}
+        <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.1em]" style={{ color: "var(--gray)" }}>
+          02 — Barang &amp; Ongkir
+        </p>
         {groups.map((group) => (
-          <div key={group.sellerId} className="mb-6 rounded-md border p-4">
-            <p className="mb-3 font-semibold">{group.storeName}</p>
+          <div
+            key={group.sellerId}
+            className="mb-4 rounded-md p-4"
+            style={{ border: "1px solid var(--line)", background: "var(--paper)" }}
+          >
+            <p className="product-store mb-2">{group.storeName}</p>
 
             <div className="space-y-2">
               {group.items.map((item) => (
-                <div key={item.id} className="flex justify-between text-sm">
+                <div key={item.id} className="flex justify-between text-[13px]">
                   <span>
                     {item.variant.product.name}
                     {item.variant.size && ` (${item.variant.size})`} x{item.qty}
                   </span>
-                  <span>
-                    Rp
-                    {(item.variant.product.price * item.qty).toLocaleString("id-ID")}
+                  <span className="font-mono">
+                    Rp{(item.variant.product.price * item.qty).toLocaleString("id-ID")}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div className="mt-2 flex justify-between border-t pt-2 text-sm font-medium">
+            <hr className="divider-dash" />
+
+            <div className="flex justify-between text-[13px] font-semibold">
               <span>Subtotal</span>
-              <span>Rp{group.itemsTotal.toLocaleString("id-ID")}</span>
+              <span className="font-mono">Rp{group.itemsTotal.toLocaleString("id-ID")}</span>
             </div>
 
             {/* Ongkir */}
@@ -287,51 +315,68 @@ export default function CheckoutPage() {
                 <button
                   onClick={() => handleCheckRates(group)}
                   disabled={checkingRates === group.sellerId}
-                  className="text-sm text-blue-600"
+                  className="tag tag-ghost text-[11px]"
                 >
-                  {checkingRates === group.sellerId
-                    ? "Mengecek ongkir..."
-                    : "Cek Ongkir"}
+                  {checkingRates === group.sellerId ? "Mengecek ongkir..." : "Cek Ongkir"}
                 </button>
               ) : (
-                <div className="space-y-1">
-                  {rates[group.sellerId].map((rate, i) => (
-                    <label
-                      key={i}
-                      className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
-                    >
-                      <span className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name={`courier-${group.sellerId}`}
-                          checked={
-                            selectedCourier[group.sellerId]?.courier_service_name ===
-                            rate.courier_service_name
-                          }
-                          onChange={() => handleSelectCourier(group.sellerId, rate)}
-                        />
-                        {rate.courier_name.toUpperCase()} - {rate.courier_service_name}{" "}
-                        <span className="text-gray-400">({rate.duration})</span>
-                      </span>
-                      <span>Rp{rate.price.toLocaleString("id-ID")}</span>
-                    </label>
-                  ))}
+                <div className="space-y-1.5">
+                  {rates[group.sellerId].map((rate, i) => {
+                    const active =
+                      selectedCourier[group.sellerId]?.courier_service_name ===
+                      rate.courier_service_name;
+                    return (
+                      <label
+                        key={i}
+                        className="flex cursor-pointer items-center justify-between rounded-md px-3 py-2.5 text-[12.5px] transition-colors"
+                        style={{
+                          border: `1px solid ${active ? "var(--ink)" : "var(--line)"}`,
+                          background: active ? "var(--muted)" : "transparent",
+                        }}
+                      >
+                        <span className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name={`courier-${group.sellerId}`}
+                            checked={active}
+                            onChange={() => handleSelectCourier(group.sellerId, rate)}
+                          />
+                          {rate.courier_name.toUpperCase()} - {rate.courier_service_name}{" "}
+                          <span style={{ color: "var(--gray)" }}>({rate.duration})</span>
+                        </span>
+                        <span className="font-mono font-semibold">
+                          Rp{rate.price.toLocaleString("id-ID")}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
               )}
             </div>
           </div>
         ))}
 
-        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-
-        <div className="flex items-center justify-between border-t pt-4">
-          <p className="text-lg font-semibold">
-            Total: Rp{grandTotal.toLocaleString("id-ID")}
+        {error && (
+          <p className="mb-4 font-mono text-[11px]" style={{ color: "var(--stamp-red)" }}>
+            {error}
           </p>
+        )}
+
+        <div
+          className="sticky bottom-4 mt-6 flex items-center justify-between rounded-md px-5 py-4"
+          style={{ background: "var(--ink)", color: "var(--paper)", boxShadow: "var(--shadow-lg)" }}
+        >
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.1em] text-white/50">Total Bayar</p>
+            <p className="font-display text-lg font-extrabold">
+              Rp{grandTotal.toLocaleString("id-ID")}
+            </p>
+          </div>
           <button
             onClick={handlePay}
             disabled={!allCourierSelected || paying}
-            className="rounded-md bg-black px-6 py-2 text-white disabled:opacity-40"
+            className="btn"
+            style={{ background: "var(--stamp-red)", color: "#fff" }}
           >
             {paying ? "Memproses..." : "Bayar Sekarang"}
           </button>

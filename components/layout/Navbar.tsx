@@ -71,8 +71,11 @@ export function Navbar() {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-8">
         <Link href="/" className="wordmark text-base sm:text-xl">
-          R.O.X.
-          <small className="hidden sm:block">MARKETPLACE FASHION</small>
+          <span className="mark">R</span>
+          <span>
+            R.O.X.
+            <small className="hidden sm:block">MARKETPLACE FASHION</small>
+          </span>
         </Link>
 
         <nav className="flex items-center gap-3 sm:gap-5">
@@ -107,24 +110,25 @@ export function Navbar() {
 
                 {profileOpen && (
                   <div
-                    className="absolute right-0 top-10 w-48 py-1"
+                    className="absolute right-0 top-11 w-52 overflow-hidden py-1"
                     style={{
                       background: "var(--paper)",
                       border: "1px solid var(--line)",
-                      borderRadius: "4px",
-                      boxShadow: "0 8px 24px -8px rgba(0,0,0,0.2)",
+                      borderRadius: "6px",
+                      boxShadow: "var(--shadow-lg)",
+                      animation: "menuIn 0.15s var(--ease-out)",
                     }}
                   >
                     <Link
                       href="/profile"
-                      className="block px-4 py-2 text-[13px] hover:bg-black/5"
+                      className="block px-4 py-2.5 text-[13px] font-medium transition-colors hover:bg-black/5"
                       onClick={() => setProfileOpen(false)}
                     >
                       Profil Saya
                     </Link>
                     <Link
                       href="/orders"
-                      className="block px-4 py-2 text-[13px] hover:bg-black/5"
+                      className="block px-4 py-2.5 text-[13px] font-medium transition-colors hover:bg-black/5"
                       onClick={() => setProfileOpen(false)}
                     >
                       Pesanan Saya
@@ -135,7 +139,7 @@ export function Navbar() {
                         <hr className="divider-dash" style={{ margin: "4px 0" }} />
                         <Link
                           href="/dashboard"
-                          className="flex items-center gap-2 px-4 py-2 text-[13px] hover:bg-black/5"
+                          className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-medium transition-colors hover:bg-black/5"
                           onClick={() => setProfileOpen(false)}
                         >
                           <LayoutDashboard className="h-3.5 w-3.5" />
@@ -143,7 +147,7 @@ export function Navbar() {
                         </Link>
                         <Link
                           href="/dashboard/profile"
-                          className="block px-4 py-2 text-[13px] hover:bg-black/5"
+                          className="block px-4 py-2.5 text-[13px] font-medium transition-colors hover:bg-black/5"
                           onClick={() => setProfileOpen(false)}
                         >
                           Profil Toko
@@ -154,7 +158,7 @@ export function Navbar() {
                     <hr className="divider-dash" style={{ margin: "4px 0" }} />
                     <button
                       onClick={() => signOut()}
-                      className="flex w-full items-center gap-2 px-4 py-2 text-left text-[13px]"
+                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] font-medium transition-colors hover:bg-black/5"
                       style={{ color: "var(--stamp-red)" }}
                     >
                       <LogOut className="h-3.5 w-3.5" />

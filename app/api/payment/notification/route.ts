@@ -10,6 +10,7 @@
 import { NextResponse } from "next/server";
 import { snap } from "@/lib/midtrans";
 import { prisma } from "@/lib/prisma";
+import { cancelOrderAndRestoreStock } from "@/services/order.service";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -20,17 +21,36 @@ export async function POST(request: Request) {
     // orang iseng yang menembak endpoint ini langsung.
     const statusResponse = await snap.transaction.notification(body);
 
-    const orderId = statusResponse.order_id as string;
+    // order_id yang dikirim ke Midtrans bisa punya suffix "-retry-<timestamp>"
+    // (dipasang oleh endpoint /api/payment/retry supaya Midtrans menerima
+    // order_id baru yang unik). Order kita sendiri selalu pakai id ASLI
+    // (tanpa suffix), jadi harus di-strip dulu sebelum dipakai untuk lookup.
+    const rawOrderId = statusResponse.order_id as string;
+    const orderId = rawOrderId.split("-retry-")[0];
+
     const transactionStatus = statusResponse.transaction_status as string;
     const fraudStatus = statusResponse.fraud_status as string | undefined;
 
+    const existingPayment = await prisma.payment.findUnique({ where: { orderId } });
+    if (!existingPayment) {
+      // Order tidak ditemukan (mustahil kalau order_id valid) — abaikan saja
+      // daripada melempar 500 yang bikin Midtrans terus mencoba ulang.
+      return NextResponse.json({ received: true });
+    }
+
+    // Jaga urutan: kalau pembayaran ini SUDAH final (SUCCESS/FAILED),
+    // notifikasi susulan yang datang telat (misal "pending" yang nyasar
+    // setelah "settlement") tidak boleh menurunkan status yang sudah final.
+    if (existingPayment.status === "SUCCESS" || existingPayment.status === "FAILED") {
+      return NextResponse.json({ received: true, ignored: "already-final" });
+    }
+
     let paymentStatus: "PENDING" | "SUCCESS" | "FAILED" = "PENDING";
-    let orderStatus: "PENDING" | "PAID" | "CANCELLED" = "PENDING";
+    let shouldCancelAndRestoreStock = false;
 
     if (transactionStatus === "capture" || transactionStatus === "settlement") {
       if (fraudStatus === "accept" || !fraudStatus) {
         paymentStatus = "SUCCESS";
-        orderStatus = "PAID";
       }
     } else if (
       transactionStatus === "cancel" ||
@@ -38,7 +58,7 @@ export async function POST(request: Request) {
       transactionStatus === "expire"
     ) {
       paymentStatus = "FAILED";
-      orderStatus = "CANCELLED";
+      shouldCancelAndRestoreStock = true;
     }
     // status "pending" (misal masih menunggu transfer VA) dibiarkan PENDING
 
@@ -51,10 +71,13 @@ export async function POST(request: Request) {
       },
     });
 
-    await prisma.order.update({
-      where: { id: orderId },
-      data: { status: orderStatus },
-    });
+    if (paymentStatus === "SUCCESS") {
+      await prisma.order.update({ where: { id: orderId }, data: { status: "PAID" } });
+    } else if (shouldCancelAndRestoreStock) {
+      // Kembalikan stok yang sempat dikunci saat checkout — pesanan yang
+      // gagal/batal/kedaluwarsa tidak boleh menahan stok selamanya.
+      await cancelOrderAndRestoreStock(orderId);
+    }
 
     return NextResponse.json({ received: true });
   } catch (error) {

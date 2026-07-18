@@ -109,12 +109,12 @@ export function ProductFilters({ categories }: { categories: Category[] }) {
               Di desktop tetap transparan, cukup buat "menangkap klik" di luar
               panel supaya dropdown bisa ditutup tanpa harus pencet tombol X. */}
           <div
-            className="fixed inset-0 z-[60] bg-black/40 sm:bg-transparent"
+            className="fixed inset-0 z-60 bg-black/40 sm:bg-transparent"
             onClick={() => setOpen(false)}
           />
 
           <div
-            className="fixed inset-x-0 bottom-0 z-[61] max-h-[75vh] overflow-y-auto rounded-t-lg p-5 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-none sm:w-80 sm:rounded-md sm:p-4"
+            className="fixed inset-x-0 bottom-0 z-61 max-h-[75vh] overflow-y-auto rounded-t-lg p-5 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-none sm:w-80 sm:rounded-md sm:p-4"
             style={{
               background: "var(--paper)",
               border: "1px solid var(--line)",

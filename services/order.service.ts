@@ -87,6 +87,41 @@ export async function createOrdersFromCart(
   return orders;
 }
 
+// Dipanggil dari webhook Midtrans saat transaksi berakhir gagal/batal/expired.
+// Mengembalikan stok yang sempat dikurangi saat checkout, supaya pesanan yang
+// tidak pernah dibayar tidak "mengunci" stok selamanya. Idempotent: kalau
+// order sudah CANCELLED sebelumnya, tidak akan mengembalikan stok dua kali.
+export async function cancelOrderAndRestoreStock(orderId: string) {
+  await prisma.$transaction(async (tx) => {
+    const order = await tx.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    });
+    if (!order || order.status === "CANCELLED") return; // sudah dibatalkan, jangan restore dobel
+
+    for (const item of order.items) {
+      await tx.productVariant.update({
+        where: { id: item.productVariantId },
+        data: { stock: { increment: item.qty } },
+      });
+    }
+
+    await tx.order.update({ where: { id: orderId }, data: { status: "CANCELLED" } });
+  });
+}
+
+// Dipanggil sebelum membuat ulang Snap token (tombol "Bayar Lagi") untuk
+// pesanan yang statusnya masih PENDING. Memvalidasi kepemilikan order supaya
+// user tidak bisa membayar ulang pesanan orang lain.
+export async function getPendingOrderForRetry(orderId: string, userId: string) {
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, userId, status: "PENDING" },
+    include: { payment: true },
+  });
+  if (!order) throw new Error("Pesanan tidak ditemukan atau sudah tidak bisa dibayar ulang");
+  return order;
+}
+
 export async function getOrderById(orderId: string, userId: string) {
   return prisma.order.findFirst({
     where: { id: orderId, userId },
